@@ -504,9 +504,9 @@
       </button>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-      <div class="lg:col-span-2 space-y-6">
-        {#if user?.role === "Admin"}
+    {#if user?.role === "Admin"}
+      <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+        <div class="xl:col-span-5 space-y-6">
           <div class="bg-white rounded-xl shadow p-6">
             <h2 class="text-xl font-semibold mb-4">Create Room</h2>
 
@@ -556,126 +556,124 @@
               </button>
             </div>
           </div>
-        {/if}
 
-        <div class="bg-white rounded-xl shadow p-6">
-          <h2 class="text-xl font-semibold mb-4">Rooms</h2>
+          <div class="bg-white rounded-xl shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">Rooms</h2>
 
-          <div class="flex flex-wrap gap-4 mb-6">
-            <div class="flex flex-col">
-              <label for="bookingDate" class="text-sm text-gray-600">Date</label>
-              <input
-                id="bookingDate"
-                type="date"
-                bind:value={bookingDate}
-                class="border rounded px-3 py-2"
-              />
+            <div class="flex flex-wrap gap-4 mb-6">
+              <div class="flex flex-col">
+                <label for="bookingDate" class="text-sm text-gray-600">Date</label>
+                <input
+                  id="bookingDate"
+                  type="date"
+                  bind:value={bookingDate}
+                  class="border rounded px-3 py-2"
+                />
+              </div>
+
+              <div class="flex flex-col">
+                <label for="startTime" class="text-sm text-gray-600">Start time</label>
+                <input
+                  id="startTime"
+                  type="time"
+                  bind:value={startTime}
+                  class="border rounded px-3 py-2"
+                />
+              </div>
+
+              <div class="flex flex-col">
+                <label for="endTime" class="text-sm text-gray-600">End time</label>
+                <input
+                  id="endTime"
+                  type="time"
+                  bind:value={endTime}
+                  class="border rounded px-3 py-2"
+                />
+              </div>
             </div>
 
-            <div class="flex flex-col">
-              <label for="startTime" class="text-sm text-gray-600">Start time</label>
-              <input
-                id="startTime"
-                type="time"
-                bind:value={startTime}
-                class="border rounded px-3 py-2"
-              />
-            </div>
+            {#if loading}
+              <p>Loading rooms...</p>
+            {:else if rooms.length === 0}
+              <p>No rooms found.</p>
+            {:else}
+              <div class="grid gap-4">
+                {#each rooms as room (room._id)}
+                  <div class="border rounded-lg p-4 flex justify-between items-start gap-4">
+                    <div class="flex-1">
+                      {#if editingRoomId === room._id}
+                        <div class="space-y-3">
+                          <div class="flex flex-col">
+                            <label for={`edit-room-name-${room._id}`} class="text-sm text-gray-600">Room name</label>
+                            <input
+                              id={`edit-room-name-${room._id}`}
+                              type="text"
+                              bind:value={editRoomName}
+                              class="border rounded px-3 py-2"
+                            />
+                          </div>
 
-            <div class="flex flex-col">
-              <label for="endTime" class="text-sm text-gray-600">End time</label>
-              <input
-                id="endTime"
-                type="time"
-                bind:value={endTime}
-                class="border rounded px-3 py-2"
-              />
-            </div>
-          </div>
+                          <div class="flex flex-col">
+                            <label for={`edit-room-capacity-${room._id}`} class="text-sm text-gray-600">Capacity</label>
+                            <input
+                              id={`edit-room-capacity-${room._id}`}
+                              type="number"
+                              bind:value={editRoomCapacity}
+                              class="border rounded px-3 py-2 w-24"
+                            />
+                          </div>
 
-          {#if loading}
-            <p>Loading rooms...</p>
-          {:else if rooms.length === 0}
-            <p>No rooms found.</p>
-          {:else}
-            <div class="grid gap-4">
-              {#each rooms as room (room._id)}
-                <div class="border rounded-lg p-4 flex justify-between items-start gap-4">
-                  <div class="flex-1">
-                    {#if editingRoomId === room._id}
-                      <div class="space-y-3">
-                        <div class="flex flex-col">
-                          <label for={`edit-room-name-${room._id}`} class="text-sm text-gray-600">Room name</label>
-                          <input
-                            id={`edit-room-name-${room._id}`}
-                            type="text"
-                            bind:value={editRoomName}
-                            class="border rounded px-3 py-2"
-                          />
+                          <div class="flex flex-col">
+                            <label for={`edit-room-type-${room._id}`} class="text-sm text-gray-600">Type</label>
+                            <select
+                              id={`edit-room-type-${room._id}`}
+                              bind:value={editRoomType}
+                              class="border rounded px-3 py-2"
+                            >
+                              <option value="conference">Conference</option>
+                              <option value="workspace">Workspace</option>
+                            </select>
+                          </div>
                         </div>
-
-                        <div class="flex flex-col">
-                          <label for={`edit-room-capacity-${room._id}`} class="text-sm text-gray-600">Capacity</label>
-                          <input
-                            id={`edit-room-capacity-${room._id}`}
-                            type="number"
-                            bind:value={editRoomCapacity}
-                            class="border rounded px-3 py-2 w-24"
-                          />
-                        </div>
-
-                        <div class="flex flex-col">
-                          <label for={`edit-room-type-${room._id}`} class="text-sm text-gray-600">Type</label>
-                          <select
-                            id={`edit-room-type-${room._id}`}
-                            bind:value={editRoomType}
-                            class="border rounded px-3 py-2"
-                          >
-                            <option value="conference">Conference</option>
-                            <option value="workspace">Workspace</option>
-                          </select>
-                        </div>
-                      </div>
-                    {:else}
-                      <div>
-                        <h3 class="font-semibold">{room.name}</h3>
-                        <p class="text-sm text-gray-600">Capacity: {room.capacity}</p>
-                        <p class="text-sm text-gray-600">Type: {room.type}</p>
-
-                        <div class="mt-3">
-                          <p class="text-sm font-medium text-gray-700">Booked:</p>
-
-                          {#if getBookingsForRoom(room._id).length === 0}
-                            <p class="text-sm text-gray-500">No bookings for this room.</p>
-                          {:else}
-                            <ul class="text-sm text-gray-600 list-disc ml-5">
-                              {#each getBookingsForRoom(room._id) as booking (booking._id)}
-                                <li>
-                                  {new Date(booking.startTime).toLocaleString()} –
-                                  {new Date(booking.endTime).toLocaleString()}
-                                </li>
-                              {/each}
-                            </ul>
-                          {/if}
-                        </div>
-                      </div>
-                    {/if}
-                  </div>
-
-                  <div class="flex flex-col gap-2 shrink-0">
-                    <button
-                      class="bg-blue-600 text-white px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                      on:click={() => handleBook(room._id)}
-                      disabled={bookingLoading || editingRoomId === room._id}
-                    >
-                      {#if bookingLoading}
-                        Booking...
                       {:else}
-                        Book
-                      {/if}
-                    </button>
+                        <div>
+                          <h3 class="font-semibold">{room.name}</h3>
+                          <p class="text-sm text-gray-600">Capacity: {room.capacity}</p>
+                          <p class="text-sm text-gray-600">Type: {room.type}</p>
 
-                    {#if user?.role === "Admin"}
+                          <div class="mt-3">
+                            <p class="text-sm font-medium text-gray-700">Booked:</p>
+
+                            {#if getBookingsForRoom(room._id).length === 0}
+                              <p class="text-sm text-gray-500">No bookings for this room.</p>
+                            {:else}
+                              <ul class="text-sm text-gray-600 list-disc ml-5">
+                                {#each getBookingsForRoom(room._id) as booking (booking._id)}
+                                  <li>
+                                    {new Date(booking.startTime).toLocaleString()} –
+                                    {new Date(booking.endTime).toLocaleString()}
+                                  </li>
+                                {/each}
+                              </ul>
+                            {/if}
+                          </div>
+                        </div>
+                      {/if}
+                    </div>
+
+                    <div class="flex flex-col gap-2 shrink-0">
+                      <button
+                        class="bg-blue-600 text-white px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        on:click={() => handleBook(room._id)}
+                        disabled={bookingLoading || editingRoomId === room._id}
+                      >
+                        {#if bookingLoading}
+                          Booking...
+                        {:else}
+                          Book
+                        {/if}
+                      </button>
+
                       {#if editingRoomId === room._id}
                         <button
                           class="bg-green-600 text-white px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50"
@@ -711,15 +709,15 @@
                           Delete
                         </button>
                       {/if}
-                    {/if}
+                    </div>
                   </div>
-                </div>
-              {/each}
-            </div>
-          {/if}
+                {/each}
+              </div>
+            {/if}
+          </div>
         </div>
 
-        {#if user?.role === "Admin"}
+        <div class="xl:col-span-4">
           <div class="bg-white rounded-xl shadow p-6">
             <h2 class="text-xl font-semibold mb-4">All Bookings</h2>
 
@@ -841,45 +839,136 @@
               </div>
             {/if}
           </div>
-        {/if}
-      </div>
-
-      {#if user?.role === "Admin"}
-        <div class="bg-white rounded-xl shadow p-6">
-          <h2 class="text-xl font-semibold mb-4">Users</h2>
-
-          {#if loading}
-            <p>Loading users...</p>
-          {:else if users.length === 0}
-            <p>No users found.</p>
-          {:else}
-            <div class="grid gap-4">
-              {#each users as listedUser (listedUser._id)}
-                <div class="border rounded-lg p-4 flex justify-between items-center gap-4">
-                  <div>
-                    <h3 class="font-semibold">{listedUser.username}</h3>
-                    <p class="text-sm text-gray-600">Role: {listedUser.role}</p>
-                  </div>
-
-                  <button
-                    class="bg-red-600 text-white px-3 py-2 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
-                    on:click={() => deleteUser(listedUser._id, listedUser.username)}
-                    disabled={deletingUserId === listedUser._id || (user?.id === listedUser._id || user?._id === listedUser._id)}
-                  >
-                    {#if deletingUserId === listedUser._id}
-                      Deleting...
-                    {:else if user?.id === listedUser._id || user?._id === listedUser._id}
-                      Current User
-                    {:else}
-                      Delete
-                    {/if}
-                  </button>
-                </div>
-              {/each}
-            </div>
-          {/if}
         </div>
-      {:else}
+
+        <div class="xl:col-span-3">
+          <div class="bg-white rounded-xl shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">Users</h2>
+
+            {#if loading}
+              <p>Loading users...</p>
+            {:else if users.length === 0}
+              <p>No users found.</p>
+            {:else}
+              <div class="grid gap-4">
+                {#each users as listedUser (listedUser._id)}
+                  <div class="border rounded-lg p-4 flex justify-between items-center gap-4">
+                    <div>
+                      <h3 class="font-semibold">{listedUser.username}</h3>
+                      <p class="text-sm text-gray-600">Role: {listedUser.role}</p>
+                    </div>
+
+                    <button
+                      class="bg-red-600 text-white px-3 py-2 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+                      on:click={() => deleteUser(listedUser._id, listedUser.username)}
+                      disabled={deletingUserId === listedUser._id || (user?.id === listedUser._id || user?._id === listedUser._id)}
+                    >
+                      {#if deletingUserId === listedUser._id}
+                        Deleting...
+                      {:else if user?.id === listedUser._id || user?._id === listedUser._id}
+                        Current User
+                      {:else}
+                        Delete
+                      {/if}
+                    </button>
+                  </div>
+                {/each}
+              </div>
+            {/if}
+          </div>
+        </div>
+      </div>
+    {:else}
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        <div class="lg:col-span-2 space-y-6">
+          <div class="bg-white rounded-xl shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">Rooms</h2>
+
+            <div class="flex flex-wrap gap-4 mb-6">
+              <div class="flex flex-col">
+                <label for="bookingDate" class="text-sm text-gray-600">Date</label>
+                <input
+                  id="bookingDate"
+                  type="date"
+                  bind:value={bookingDate}
+                  class="border rounded px-3 py-2"
+                />
+              </div>
+
+              <div class="flex flex-col">
+                <label for="startTime" class="text-sm text-gray-600">Start time</label>
+                <input
+                  id="startTime"
+                  type="time"
+                  bind:value={startTime}
+                  class="border rounded px-3 py-2"
+                />
+              </div>
+
+              <div class="flex flex-col">
+                <label for="endTime" class="text-sm text-gray-600">End time</label>
+                <input
+                  id="endTime"
+                  type="time"
+                  bind:value={endTime}
+                  class="border rounded px-3 py-2"
+                />
+              </div>
+            </div>
+
+            {#if loading}
+              <p>Loading rooms...</p>
+            {:else if rooms.length === 0}
+              <p>No rooms found.</p>
+            {:else}
+              <div class="grid gap-4">
+                {#each rooms as room (room._id)}
+                  <div class="border rounded-lg p-4 flex justify-between items-start gap-4">
+                    <div class="flex-1">
+                      <div>
+                        <h3 class="font-semibold">{room.name}</h3>
+                        <p class="text-sm text-gray-600">Capacity: {room.capacity}</p>
+                        <p class="text-sm text-gray-600">Type: {room.type}</p>
+
+                        <div class="mt-3">
+                          <p class="text-sm font-medium text-gray-700">Booked:</p>
+
+                          {#if getBookingsForRoom(room._id).length === 0}
+                            <p class="text-sm text-gray-500">No bookings for this room.</p>
+                          {:else}
+                            <ul class="text-sm text-gray-600 list-disc ml-5">
+                              {#each getBookingsForRoom(room._id) as booking (booking._id)}
+                                <li>
+                                  {new Date(booking.startTime).toLocaleString()} –
+                                  {new Date(booking.endTime).toLocaleString()}
+                                </li>
+                              {/each}
+                            </ul>
+                          {/if}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="flex flex-col gap-2 shrink-0">
+                      <button
+                        class="bg-blue-600 text-white px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        on:click={() => handleBook(room._id)}
+                        disabled={bookingLoading}
+                      >
+                        {#if bookingLoading}
+                          Booking...
+                        {:else}
+                          Book
+                        {/if}
+                      </button>
+                    </div>
+                  </div>
+                {/each}
+              </div>
+            {/if}
+          </div>
+        </div>
+
         <div class="bg-white rounded-xl shadow p-6">
           <h2 class="text-xl font-semibold mb-4">My Bookings</h2>
 
@@ -993,7 +1082,7 @@
             </div>
           {/if}
         </div>
-      {/if}
-    </div>
+      </div>
+    {/if}
   </div>
 </div>

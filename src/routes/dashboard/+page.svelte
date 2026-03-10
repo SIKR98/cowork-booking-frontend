@@ -47,10 +47,20 @@
     endTime: string;
   };
 
+  type Notification = {
+    _id: string;
+    type: string;
+    title: string;
+    message: string;
+    isRead: boolean;
+    createdAt: string;
+  };
+
   let user: User | null = null;
   let users: AdminUser[] = [];
   let rooms: Room[] = [];
   let bookings: Booking[] = [];
+  let notifications: Notification[] = [];
   let loading = true;
 
   let bookingDate = "2026-03-09";
@@ -77,6 +87,9 @@
   let editEndTime = "";
   let updatingBookingLoading = false;
 
+  let notificationsOpen = false;
+  let notificationsLoading = false;
+
   if (typeof localStorage !== "undefined") {
     const stored = localStorage.getItem("user");
     if (stored) {
@@ -97,6 +110,11 @@
         headers: {
           Authorization: `Bearer ${token}`
         }
+      }),
+      apiFetch("/notifications", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       })
     ];
 
@@ -114,16 +132,88 @@
 
     const roomsRes = results[0] as { rooms: Room[] };
     const bookingsRes = results[1] as { bookings: Booking[] };
+    const notificationsRes = results[2] as { notifications: Notification[] };
 
     rooms = roomsRes.rooms;
     bookings = bookingsRes.bookings;
+    notifications = notificationsRes.notifications;
 
-    if (user?.role === "Admin" && results[2]) {
-      const usersRes = results[2] as { users: AdminUser[] };
+    if (user?.role === "Admin" && results[3]) {
+      const usersRes = results[3] as { users: AdminUser[] };
       users = usersRes.users;
     } else {
       users = [];
     }
+  }
+
+  async function loadNotifications() {
+    try {
+      notificationsLoading = true;
+
+      const token = localStorage.getItem("token") || "";
+      const res = await apiFetch("/notifications", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      notifications = (res.notifications || []) as Notification[];
+    } catch (err) {
+      console.error(err);
+    } finally {
+      notificationsLoading = false;
+    }
+  }
+
+  function unreadNotificationsCount() {
+    return notifications.filter((n) => !n.isRead).length;
+  }
+
+  async function markAllNotificationsAsRead() {
+    const unreadCount = unreadNotificationsCount();
+    if (unreadCount === 0) return;
+
+    try {
+      const token = localStorage.getItem("token") || "";
+
+      await apiFetch("/notifications/read-all", {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      notifications = notifications.map((notification) => ({
+        ...notification,
+        isRead: true
+      }));
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function toggleNotifications() {
+    notificationsOpen = !notificationsOpen;
+
+    if (notificationsOpen) {
+      await loadNotifications();
+      await markAllNotificationsAsRead();
+    }
+  }
+
+  function formatTimeAgo(dateString: string) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+
+    const minutes = Math.floor(diffMs / (1000 * 60));
+    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (minutes < 1) return "Just now";
+    if (minutes < 60) return `${minutes} min ago`;
+    if (hours < 24) return `${hours} h ago`;
+    return `${days} day${days === 1 ? "" : "s"} ago`;
   }
 
   onMount(async () => {
@@ -496,12 +586,70 @@
         {/if}
       </div>
 
-      <button
-        class="bg-black text-white px-4 py-2 rounded-lg cursor-pointer"
-        on:click={logout}
-      >
-        Logout
-      </button>
+      <div class="flex items-center gap-3 relative">
+        <button
+          class="relative bg-white border border-gray-300 text-gray-900 px-4 py-2 rounded-lg cursor-pointer hover:bg-gray-50"
+          on:click={toggleNotifications}
+        >
+          <span class="text-lg">🔔</span>
+
+          {#if unreadNotificationsCount() > 0}
+            <span class="absolute -top-2 -right-2 min-w-5 h-5 px-1 bg-red-600 text-white text-xs rounded-full flex items-center justify-center">
+              {unreadNotificationsCount()}
+            </span>
+          {/if}
+        </button>
+
+        <button
+          class="bg-black text-white px-4 py-2 rounded-lg cursor-pointer"
+          on:click={logout}
+        >
+          Logout
+        </button>
+
+        {#if notificationsOpen}
+          <div class="absolute right-0 top-14 w-96 max-w-[90vw] bg-white border border-gray-200 rounded-xl shadow-lg p-4 z-50">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-lg font-semibold">Notifications</h2>
+              <button
+                class="text-sm text-gray-500 hover:text-gray-700 cursor-pointer"
+                on:click={() => (notificationsOpen = false)}
+              >
+                Close
+              </button>
+            </div>
+
+            {#if notificationsLoading}
+              <p class="text-sm text-gray-500">Loading notifications...</p>
+            {:else if notifications.length === 0}
+              <p class="text-sm text-gray-500">No notifications yet.</p>
+            {:else}
+              <div class="max-h-96 overflow-y-auto space-y-3">
+                {#each notifications as notification (notification._id)}
+                  <div
+                    class={`border rounded-lg p-3 ${
+                      notification.isRead ? "bg-white" : "bg-gray-50"
+                    }`}
+                  >
+                    <div class="flex items-start justify-between gap-3">
+                      <div>
+                        <h3 class="font-medium text-sm">{notification.title}</h3>
+                        <p class="text-sm text-gray-600 mt-1">
+                          {notification.message}
+                        </p>
+                      </div>
+
+                      <span class="text-xs text-gray-400 shrink-0">
+                        {formatTimeAgo(notification.createdAt)}
+                      </span>
+                    </div>
+                  </div>
+                {/each}
+              </div>
+            {/if}
+          </div>
+        {/if}
+      </div>
     </div>
 
     {#if user?.role === "Admin"}

@@ -3,6 +3,8 @@
   import { apiFetch } from "$lib/api/api";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
+  import { PUBLIC_API_BASE_URL } from "$env/static/public";
+  import { io, type Socket } from "socket.io-client";
 
   type User = {
     id?: string;
@@ -89,6 +91,8 @@
 
   let notificationsOpen = false;
   let notificationsLoading = false;
+
+  let socket: Socket | null = null;
 
   if (typeof localStorage !== "undefined") {
     const stored = localStorage.getItem("user");
@@ -216,14 +220,55 @@
     return `${days} day${days === 1 ? "" : "s"} ago`;
   }
 
-  onMount(async () => {
-    try {
-      await loadDashboardData();
-    } catch (err) {
-      console.error(err);
-    } finally {
-      loading = false;
-    }
+  function connectSocket() {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    socket = io(PUBLIC_API_BASE_URL, {
+      transports: ["websocket"],
+      auth: {
+        token
+      }
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error("Socket connection error:", err.message);
+    });
+
+    socket.on("notification", async (incoming: Notification) => {
+      const exists = notifications.some((n) => n._id === incoming._id);
+      if (exists) return;
+
+      notifications = [
+        {
+          ...incoming,
+          isRead: notificationsOpen ? true : incoming.isRead
+        },
+        ...notifications
+      ];
+
+      if (notificationsOpen) {
+        await markAllNotificationsAsRead();
+      }
+    });
+  }
+
+  onMount(() => {
+    (async () => {
+      try {
+        await loadDashboardData();
+        connectSocket();
+      } catch (err) {
+        console.error(err);
+      } finally {
+        loading = false;
+      }
+    })();
+
+    return () => {
+      socket?.disconnect();
+      socket = null;
+    };
   });
 
   async function handleBook(roomId: string) {

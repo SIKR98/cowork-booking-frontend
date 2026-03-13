@@ -27,3 +27,8 @@ jobs:
         run: npm run check
         env:
           PUBLIC_API_BASE_URL: http://localhost:3000
+
+      - name: Build project
+        run: npm run build
+        env:
+          PUBLIC_API_BASE_URL: http://localhost:3000

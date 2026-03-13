@@ -620,7 +620,9 @@
 {#if loading}
 	<div class="flex min-h-screen items-center justify-center bg-white">
 		<div class="flex flex-col items-center gap-4">
-			<div class="h-12 w-12 animate-spin rounded-full border-4 border-gray-300 border-t-black"></div>
+			<div
+				class="h-12 w-12 animate-spin rounded-full border-4 border-gray-300 border-t-black"
+			></div>
 			<p class="text-sm text-gray-600">Loading...</p>
 		</div>
 	</div>
@@ -802,8 +804,9 @@
 												{#if editingRoomId === room._id}
 													<div class="space-y-3">
 														<div class="flex flex-col">
-															<label for={`edit-room-name-${room._id}`} class="text-sm text-gray-600"
-																>Room name</label
+															<label
+																for={`edit-room-name-${room._id}`}
+																class="text-sm text-gray-600">Room name</label
 															>
 															<input
 																id={`edit-room-name-${room._id}`}
@@ -827,8 +830,9 @@
 														</div>
 
 														<div class="flex flex-col">
-															<label for={`edit-room-type-${room._id}`} class="text-sm text-gray-600"
-																>Type</label
+															<label
+																for={`edit-room-type-${room._id}`}
+																class="text-sm text-gray-600">Type</label
 															>
 															<select
 																id={`edit-room-type-${room._id}`}

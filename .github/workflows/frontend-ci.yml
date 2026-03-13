@@ -32,3 +32,6 @@ jobs:
         run: npm run build
         env:
           PUBLIC_API_BASE_URL: http://localhost:3000
+
+      - name: Run dependency audit
+        run: npm audit --audit-level=high

@@ -1,42 +1,9 @@
-# sv
+Frontend – README
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+This is the frontend for the cowork booking system, built with SvelteKit and TypeScript. It provides a user interface where users can log in, view rooms, create and manage bookings, and receive real-time notifications. Admin users have access to additional features such as managing rooms and users.
 
-## Creating a project
+The application communicates with a Node.js backend through a REST API and uses Socket.IO to receive live updates without needing to refresh the page. Notifications are shown instantly when bookings or rooms are changed, and the interface updates automatically to reflect the latest data.
 
-If you're seeing this, you've probably already done this step. Congrats!
+The frontend is deployed on Vercel and connects to the backend using an environment variable for the API base URL. To run locally, install dependencies and start the development server, making sure the correct backend URL is set in the environment configuration.
 
-```sh
-# create a new project
-npx sv create my-app
-```
-
-To recreate this project with the same configuration:
-
-```sh
-# recreate this project
-npx sv@0.12.5 create --template minimal --types ts --add prettier eslint tailwindcss="plugins:none" --install npm .
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+This project fulfills the course requirements including authentication, role-based access, CRUD operations, real-time notifications, caching with Redis, and logging/error handling.

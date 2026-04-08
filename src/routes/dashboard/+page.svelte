@@ -65,9 +65,27 @@
 	let notifications: Notification[] = [];
 	let loading = true;
 
-	let bookingDate = '2026-03-09';
-	let startTime = '09:00';
-	let endTime = '10:00';
+	function getDefaultBookingValues() {
+		const now = new Date();
+
+		const nextHourTimestamp =
+			Math.ceil(now.getTime() / (60 * 60 * 1000)) * (60 * 60 * 1000);
+
+		const nextHour = new Date(nextHourTimestamp);
+		const endHour = new Date(nextHourTimestamp + 60 * 60 * 1000);
+
+		return {
+			bookingDate: formatDateForInput(nextHour),
+			startTime: formatTimeForInput(nextHour),
+			endTime: formatTimeForInput(endHour)
+		};
+	}
+
+	const defaultBookingValues = getDefaultBookingValues();
+
+	let bookingDate = defaultBookingValues.bookingDate;
+	let startTime = defaultBookingValues.startTime;
+	let endTime = defaultBookingValues.endTime;
 
 	let roomName = '';
 	let roomCapacity = 1;

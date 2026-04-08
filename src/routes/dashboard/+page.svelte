@@ -68,8 +68,7 @@
 	function getDefaultBookingValues() {
 		const now = new Date();
 
-		const nextHourTimestamp =
-			Math.ceil(now.getTime() / (60 * 60 * 1000)) * (60 * 60 * 1000);
+		const nextHourTimestamp = Math.ceil(now.getTime() / (60 * 60 * 1000)) * (60 * 60 * 1000);
 
 		const nextHour = new Date(nextHourTimestamp);
 		const endHour = new Date(nextHourTimestamp + 60 * 60 * 1000);
